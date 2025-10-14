@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda - Control de Producción</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section h2::before {
+            font-size: 32px;
+            margin-right: 15px;
+        }
+        
+        .step-card {
+            background: #f8fafc;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        
+        .step-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .step-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .event-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .event-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .event-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .event-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .alert {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            border-left-color: #10b981;
+        }
+        
+        .back-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+        
+        .faq {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .faq-answer {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 Guía de Usuario</h1>
+            <p>Sistema de Control de Producción por QR</p>
+        </div>
+
+        <!-- Sección: Cómo usar -->
+        <div class="section">
+            <h2 style="--icon: '🚀';">🚀 Cómo Usar el Sistema</h2>
+            
+            <div class="step-card">
+                <h3>Paso 1: Escanear tu QR de Operario</h3>
+                <p>Cada operario tiene un código QR único. Escanéalo presionando el botón "Escanear QR Operario". Apunta la cámara al código hasta que se registre automáticamente.</p>
+            </div>
+
+            <div class="step-card">
+                <h3>Paso 2: Escanear el QR de la Máquina</h3>
+                <p>Cada máquina del taller tiene su propio QR pegado cerca del panel de control. Escanéalo para registrar en qué equipo vas a trabajar.</p>
+            </div>
+
+            <div class="step-card">
+                <h3>Paso 3: Escanear la Orden de Trabajo</h3>
+                <p>Las órdenes de trabajo vienen con un QR impreso. Escanéalo para vincular tu trabajo con el proyecto específico.</p>
+            </div>
+
+            <div class="step-card">
+                <h3>Paso 4: Seleccionar el Evento</h3>
+                <p>Elige qué estás haciendo: iniciar trabajo, tomar una pausa, reanudar, terminar jornada o finalizar la orden completa.</p>
+            </div>
+
+            <div class="step-card">
+                <h3>Paso 5: Agregar Comentarios (opcional)</h3>
+                <p>Si hay algo importante que reportar (problema, observación, etc.), escríbelo en el campo de comentarios.</p>
+            </div>
+
+            <div class="step-card">
+                <h3>Paso 6: Enviar Registro</h3>
+                <p>Presiona el botón "Enviar Registro". Verás una confirmación cuando se haya guardado correctamente.</p>
+            </div>
+        </div>
+
+        <!-- Sección: Tipos de eventos -->
+        <div class="section">
+            <h2>📋 Tipos de Eventos</h2>
+            
+            <table class="event-table">
+                <thead>
+                    <tr>
+                        <th>Evento</th>
+                        <th>Cuándo Usarlo</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>🟢 INICIO</strong></td>
+                        <td>Al comenzar a trabajar en una orden</td>
+                        <td>Llegaste al turno y empiezas una nueva OT</td>
+                    </tr>
+                    <tr>
+                        <td><strong>⏸️ PAUSA</strong></td>
+                        <td>Cuando interrumpes temporalmente</td>
+                        <td>Vas al baño, a comer, o cambias de tarea</td>
+                    </tr>
+                    <tr>
+                        <td><strong>▶️ REANUDAR</strong></td>
+                        <td>Cuando vuelves después de una pausa</td>
+                        <td>Regresas de la pausa y continúas trabajando</td>
+                    </tr>
+                    <tr>
+                        <td><strong>🏁 FIN JORNADA</strong></td>
+                        <td>Al terminar tu turno de trabajo</td>
+                        <td>Tu turno terminó pero la OT aún no está completa</td>
+                    </tr>
+                    <tr>
+                        <td><strong>✅ FIN DEFINITIVO</strong></td>
+                        <td>Cuando terminas completamente una OT</td>
+                        <td>La pieza/trabajo está terminado y aprobado</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Sección: Buenas prácticas -->
+        <div class="section">
+            <h2>✅ Buenas Prácticas</h2>
+            
+            <div class="alert alert-success">
+                <strong>✓ Escanea inmediatamente:</strong> Registra cada evento justo cuando ocurre, no al final del día.
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>✓ Sé consistente:</strong> Siempre usa PAUSA cuando dejes la máquina, aunque sea por 5 minutos.
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>✓ Agrega comentarios:</strong> Si algo inusual ocurre (problema, demora, etc.), regístralo en comentarios.
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>✓ Verifica antes de enviar:</strong> Confirma que escaneaste los QR correctos antes de presionar enviar.
+            </div>
+        </div>
+
+        <!-- Sección: Problemas comunes -->
+        <div class="section">
+            <h2>❓ Preguntas Frecuentes</h2>
+            
+            <div class="faq">
+                <div class="faq-question">¿Qué hago si la cámara no funciona?</div>
+                <div class="faq-answer">Verifica que diste permisos de cámara al navegador. En Chrome: ícono de candado → Permisos del sitio → Cámara: Permitir.</div>
+            </div>
+
+            <div class="faq">
+                <div class="faq-question">¿Puedo escanear los QR en cualquier orden?</div>
+                <div class="faq-answer">No, debes seguir el orden: primero Operario, luego Máquina, luego OT.</div>
+            </div>
+
+            <div class="faq">
+                <div class="faq-question">¿Qué pasa si me equivoco al escanear?</div>
+                <div class="faq-answer">Puedes volver a escanear el QR correcto. El sistema siempre usa el último código escaneado.</div>
+            </div>
+
+            <div class="faq">
+                <div class="faq-question">¿Funciona sin internet?</div>
+                <div class="faq-answer">Necesitas conexión a internet para enviar los registros, pero puedes escanear los QR sin conexión.</div>
+            </div>
+
+            <div class="faq">
+                <div class="faq-question">¿Dónde veo mis registros anteriores?</div>
+                <div class="faq-answer">Tu supervisor puede consultar todos los registros en la hoja de Google Sheets del sistema.</div>
+            </div>
+        </div>
+
+        <!-- Sección: Soporte -->
+        <div class="section">
+            <h2>🆘 Soporte Técnico</h2>
+            
+            <div class="alert">
+                Si tienes problemas técnicos o dudas, contacta a:<br>
+                <strong>📧 Email:</strong> soporte@tuempresa.com<br>
+                <strong>📱 Teléfono:</strong> +XX XXXX-XXXX<br>
+                <strong>⏰ Horario:</strong> Lunes a Viernes, 8:00 - 18:00
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="back-button">← Volver al Sistema</a>
+        </div>
+    </div>
+</body>
+</html>

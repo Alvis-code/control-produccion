@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes y Gráficos - Control de Producción</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .chart-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .chart-card h2::before {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        .filters {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-group label {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            padding: 10px 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .apply-button {
+            padding: 10px 25px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .apply-button:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Reportes y Análisis</h1>
+            <p>Visualización de datos de producción</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filters">
+            <div class="filter-group">
+                <label>Fecha Inicio</label>
+                <input type="date" id="fecha-inicio">
+            </div>
+            <div class="filter-group">
+                <label>Fecha Fin</label>
+                <input type="date" id="fecha-fin">
+            </div>
+            <div class="filter-group">
+                <label>Operario</label>
+                <select id="filter-operario">
+                    <option value="">Todos</option>
+                    <option value="OP-001">OP-001</option>
+                    <option value="OP-002">OP-002</option>
+                    <option value="OP-003">OP-003</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Máquina</label>
+                <select id="filter-maquina">
+                    <option value="">Todas</option>
+                    <option value="TORNO-CNC-01">TORNO-CNC-01</option>
+                    <option value="FRESADORA-01">FRESADORA-01</option>
+                </select>
+            </div>
+            <button class="apply-button" onclick="applyFilters()">🔍 Aplicar Filtros</button>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="charts-grid">
+            <!-- Gráfico 1: Producción por Turno -->
+            <div class="chart-card">
+                <h2 style="--icon: '📈';">📈 Producción por Turno</h2>
+                <div class="chart-container">
+                    <canvas id="chartTurnos"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 2: Eficiencia por Máquina -->
+            <div class="chart-card">
+                <h2 style="--icon: '⚙️';">⚙️ Eficiencia por Máquina</h2>
+                <div class="chart-container">
+                    <canvas id="chartMaquinas"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 3: Eventos por Día -->
+            <div class="chart-card">
+                <h2 style="--icon: '📅';">📅 Eventos Registrados (Últimos 7 días)</h2>
+                <div class="chart-container">
+                    <canvas id="chartEventos"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 4: Tiempo por Operario -->
+            <div class="chart-card">
+                <h2 style="--icon: '👥';">👥 Tiempo Trabajado por Operario</h2>
+                <div class="chart-container">
+                    <canvas id="chartOperarios"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 5: OEE por Máquina -->
+            <div class="chart-card">
+                <h2 style="--icon: '🎯';">🎯 OEE (Overall Equipment Effectiveness)</h2>
+                <div class="chart-container">
+                    <canvas id="chartOEE"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico 6: Pausas vs Trabajo -->
+            <div class="chart-card">
+                <h2 style="--icon: '⏱️';">⏱️ Tiempo Productivo vs Pausas</h2>
+                <div class="chart-container">
+                    <canvas id="chartPausas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURACIÓN DE COLORES =====
+        const colors = {
+            primary: '#667eea',
+            secondary: '#764ba2',
+            success: '#10b981',
+            warning: '#f59e0b',
+            danger: '#ef4444',
+            info: '#06b6d4'
+        };
+
+        // ===== DATOS DE EJEMPLO =====
+        const dataTurnos = {
+            labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            datasets: [
+                {
+                    label: 'Turno 1',
+                    data: [45, 52, 48, 55, 50, 42],
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Turno 2',
+                    data: [38, 42, 45, 40, 44, 38],
+                    backgroundColor: colors.secondary,
+                    borderColor: colors.secondary,
+                    borderWidth: 2
+                },
+                {
+                    label: 'Turno 3',
+                    data: [25, 28, 30, 27, 29, 24],
+                    backgroundColor: colors.info,
+                    borderColor: colors.info,
+                    borderWidth: 2
+                }
+            ]
+        };
+
+        const dataMaquinas = {
+            labels: ['TORNO-CNC-01', 'TORNO-CNC-02', 'FRESADORA-01', 'FRESADORA-02', 'CMM-01'],
+            datasets: [{
+                label: 'Eficiencia (%)',
+                data: [87, 92, 78, 85, 95],
+                backgroundColor: [
+                    colors.success,
+                    colors.primary,
+                    colors.warning,
+                    colors.secondary,
+                    colors.info
+                ],
+                borderWidth: 0
+            }]
+        };
+
+        const dataEventos = {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            datasets: [
+                {
+                    label: 'INICIO',
+                    data: [45, 52, 48, 55, 50, 42, 38],
+                    borderColor: colors.success,
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'PAUSA',
+                    data: [12, 15, 18, 14, 16, 13, 11],
+                    borderColor: colors.warning,
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'FIN_DEFINITIVO',
+                    data: [8, 12, 10, 15, 13, 9, 7],
+                    borderColor: colors.info,
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        };
+
+        const dataOperarios = {
+            labels: ['OP-001', 'OP-002', 'OP-003', 'OP-004', 'OP-005'],
+            datasets: [{
+                label: 'Horas Trabajadas',
+                data: [42, 38, 45, 40, 37],
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+                borderWidth: 2
+            }]
+        };
+
+        const dataOEE = {
+            labels: ['TORNO-01', 'TORNO-02', 'FRES-01', 'FRES-02', 'CMM-01'],
+            datasets: [
+                {
+                    label: 'Disponibilidad',
+                    data: [95, 92, 88, 90, 96],
+                    backgroundColor: 'rgba(102, 126, 234, 0.8)'
+                },
+                {
+                    label: 'Rendimiento',
+                    data: [87, 90, 82, 85, 93],
+                    backgroundColor: 'rgba(118, 75, 162, 0.8)'
+                },
+                {
+                    label: 'Calidad',
+                    data: [98, 97, 95, 96, 99],
+                    backgroundColor: 'rgba(16, 185, 129, 0.8)'
+                }
+            ]
+        };
+
+        const dataPausas = {
+            labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'],
+            datasets: [
+                {
+                    label: 'Tiempo Productivo',
+                    data: [385, 420, 395, 410, 400],
+                    backgroundColor: colors.success
+                },
+                {
+                    label: 'Pausas',
+                    data: [95, 60, 85, 70, 80],
+                    backgroundColor: colors.warning
+                }
+            ]
+        };
+
+        // ===== INICIALIZACIÓN DE GRÁFICOS =====
+        window.addEventListener('load', () => {
+            createBarChart('chartTurnos', dataTurnos);
+            createHorizontalBarChart('chartMaquinas', dataMaquinas);
+            createLineChart('chartEventos', dataEventos);
+            createBarChart('chartOperarios', dataOperarios);
+            createStackedBarChart('chartOEE', dataOEE);
+            createStackedBarChart('chartPausas', dataPausas);
+            setDefaultDates();
+        });
+
+        // ===== FUNCIONES DE CREACIÓN DE GRÁFICOS =====
+        function createBarChart(canvasId, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createHorizontalBarChart(canvasId, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        function createLineChart(canvasId, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createStackedBarChart(canvasId, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // ===== FUNCIONES DE FILTROS =====
+        function setDefaultDates() {
+            const today = new Date();
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('fecha-inicio').value = weekAgo.toISOString().split('T')[0];
+            document.getElementById('fecha-fin').value = today.toISOString().split('T')[0];
+        }
+
+        function applyFilters() {
+            const fechaInicio = document.getElementById('fecha-inicio').value;
+            const fechaFin = document.getElementById('fecha-fin').value;
+            const operario = document.getElementById('filter-operario').value;
+            const maquina = document.getElementById('filter-maquina').value;
+
+            console.log('Filtros aplicados:', {
+                fechaInicio,
+                fechaFin,
+                operario,
+                maquina
+            });
+
+            // Aquí implementarías la llamada a tu API para obtener datos filtrados
+            // fetchFilteredData(fechaInicio, fechaFin, operario, maquina);
+            
+            alert('Filtros aplicados correctamente. En producción, aquí se cargarían datos del servidor.');
+        }
+
+        // ===== EXPORTACIÓN DE REPORTES =====
+        function exportToPDF() {
+            alert('Funcionalidad de exportación a PDF en desarrollo');
+        }
+
+        function exportToExcel() {
+            alert('Funcionalidad de exportación a Excel en desarrollo');
+        }
+    </script>
+</body>
+</html>

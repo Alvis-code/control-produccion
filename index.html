@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Producción - Taller</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.scanning {
+            background: #fbbf24;
+        }
+        
+        .status-indicator.success {
+            background: #10b981;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .scan-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px dashed #cbd5e1;
+        }
+        
+        .scan-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .scan-section h3::before {
+            content: "📷";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+        
+        .scan-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        
+        .scan-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .scan-button:active {
+            transform: translateY(0);
+        }
+        
+        .data-display {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        
+        .data-label {
+            font-weight: 600;
+            color: #64748b;
+        }
+        
+        .data-value {
+            color: #667eea;
+            font-weight: 700;
+        }
+        
+        .event-selector {
+            margin: 20px 0;
+        }
+        
+        .event-selector label {
+            display: block;
+            margin-bottom: 10px;
+            color: #64748b;
+            font-weight: 600;
+        }
+        
+        .event-selector select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 16px;
+            color: #333;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .event-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .comments-section {
+            margin: 20px 0;
+        }
+        
+        .comments-section label {
+            display: block;
+            margin-bottom: 10px;
+            color: #64748b;
+            font-weight: 600;
+        }
+        
+        .comments-section textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .comments-section textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .submit-button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #video {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏭 Control de Producción</h1>
+            <p>Sistema de Registro por QR</p>
+        </div>
+
+        <!-- Sección Operario -->
+        <div class="scan-section">
+            <h3>1. Escanear Operario</h3>
+            <button class="scan-button" onclick="startScan('operario')">
+                🪪 Escanear QR Operario
+            </button>
+            <div id="operario-display" class="data-display" style="display: none;">
+                <div class="data-item">
+                    <span class="data-label">Operario:</span>
+                    <span class="data-value" id="operario-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección Máquina -->
+        <div class="scan-section">
+            <h3>2. Escanear Máquina</h3>
+            <button class="scan-button" onclick="startScan('maquina')">
+                ⚙️ Escanear QR Máquina
+            </button>
+            <div id="maquina-display" class="data-display" style="display: none;">
+                <div class="data-item">
+                    <span class="data-label">Máquina:</span>
+                    <span class="data-value" id="maquina-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección OT -->
+        <div class="scan-section">
+            <h3>3. Escanear Orden de Trabajo</h3>
+            <button class="scan-button" onclick="startScan('ot')">
+                📋 Escanear QR Orden
+            </button>
+            <div id="ot-display" class="data-display" style="display: none;">
+                <div class="data-item">
+                    <span class="data-label">Orden:</span>
+                    <span class="data-value" id="ot-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video para escaneo -->
+        <video id="video" autoplay playsinline></video>
+
+        <!-- Selector de Evento -->
+        <div class="event-selector">
+            <label for="evento">4. Seleccionar Evento</label>
+            <select id="evento" required>
+                <option value="">-- Seleccione un evento --</option>
+                <option value="INICIO">🟢 INICIO - Comenzar trabajo</option>
+                <option value="PAUSA">⏸️ PAUSA - Pausa temporal</option>
+                <option value="REANUDAR">▶️ REANUDAR - Continuar trabajo</option>
+                <option value="FIN_JORNADA">🏁 FIN JORNADA - Terminar turno</option>
+                <option value="FIN_DEFINITIVO">✅ FIN DEFINITIVO - Completar OT</option>
+            </select>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="comments-section">
+            <label for="comentarios">Comentarios (opcional)</label>
+            <textarea id="comentarios" placeholder="Observaciones, incidencias, notas..."></textarea>
+        </div>
+
+        <!-- Botón Enviar -->
+        <button class="submit-button" onclick="submitData()" id="submit-btn">
+            📤 Enviar Registro
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script>
+        // ===== CONFIGURACIÓN =====
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyl5i6NQ65hvNpgW93DXca3HgE1GDWCNPQfo3FLvvac7xhSLA-WGwmI0Fvdca1cXW4/exec'; // ⚠️ CAMBIAR POR TU URL
+
+        // ===== ESTADO DE LA APLICACIÓN =====
+        const appState = {
+            operario_id: null,
+            maquina_id: null,
+            ot_id: null,
+            currentScanType: null
+        };
+
+        // ===== ESCANEO QR =====
+        let stream = null;
+        const video = document.getElementById('video');
+
+        async function startScan(type) {
+            appState.currentScanType = type;
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = stream;
+                video.style.display = 'block';
+                video.play();
+                
+                requestAnimationFrame(scanQR);
+            } catch (err) {
+                showNotification('Error al acceder a la cámara: ' + err.message, 'error');
+            }
+        }
+
+        function scanQR() {
+            if (!video.videoWidth) {
+                requestAnimationFrame(scanQR);
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0);
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                processQRCode(code.data);
+                stopScan();
+            } else {
+                requestAnimationFrame(scanQR);
+            }
+        }
+
+        function stopScan() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                video.style.display = 'none';
+                stream = null;
+            }
+        }
+
+        function processQRCode(data) {
+            try {
+                const url = new URL(data);
+                const params = new URLSearchParams(url.search);
+                const type = params.get('type');
+                const id = params.get('id');
+
+                if (!type || !id) {
+                    showNotification('QR inválido: faltan parámetros', 'error');
+                    return;
+                }
+
+                if (type === appState.currentScanType) {
+                    appState[type + '_id'] = id;
+                    document.getElementById(type + '-value').textContent = id;
+                    document.getElementById(type + '-display').style.display = 'block';
+                    showNotification(`✓ ${type.toUpperCase()} registrado: ${id}`, 'success');
+                } else {
+                    showNotification(`QR incorrecto. Esperaba ${appState.currentScanType}, recibió ${type}`, 'error');
+                }
+            } catch (err) {
+                showNotification('Error procesando QR: ' + err.message, 'error');
+            }
+        }
+
+        // ===== ENVÍO DE DATOS =====
+        async function submitData() {
+            // Validaciones
+            if (!appState.operario_id || !appState.maquina_id || !appState.ot_id) {
+                showNotification('⚠️ Debes escanear operario, máquina y OT', 'error');
+                return;
+            }
+
+            const evento = document.getElementById('evento').value;
+            if (!evento) {
+                showNotification('⚠️ Debes seleccionar un evento', 'error');
+                return;
+            }
+
+            const comentarios = document.getElementById('comentarios').value;
+
+            const data = {
+                operario_id: appState.operario_id,
+                maquina_id: appState.maquina_id,
+                ot_id: appState.ot_id,
+                evento: evento,
+                comentarios: comentarios
+            };
+
+            // Deshabilitar botón
+            const btn = document.getElementById('submit-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Enviando...';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification('✅ Registro guardado correctamente', 'success');
+                    resetForm();
+                } else {
+                    showNotification('❌ Error: ' + result.error, 'error');
+                }
+            } catch (err) {
+                showNotification('❌ Error de conexión: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📤 Enviar Registro';
+            }
+        }
+
+        // ===== FUNCIONES AUXILIARES =====
+        function resetForm() {
+            appState.operario_id = null;
+            appState.maquina_id = null;
+            appState.ot_id = null;
+            
+            document.getElementById('operario-display').style.display = 'none';
+            document.getElementById('maquina-display').style.display = 'none';
+            document.getElementById('ot-display').style.display = 'none';
+            document.getElementById('evento').value = '';
+            document.getElementById('comentarios').value = '';
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        // Prevenir cierre accidental de cámara
+        window.addEventListener('beforeunload', () => {
+            stopScan();
+        });
+    </script>
+</body>
+</html>
